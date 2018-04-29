@@ -460,7 +460,7 @@ local libWexpr = {
                      self.errormsg = path .. ":Error: Map keys can only be valid UTF-8 strings."
                      error(self.errormsg)
                   else
-                     chunk = chunk .. indentString .. "\"" .. self:escapeString(k) .. "\"" .. tostring(k) .. " " .. vchunk
+                     chunk = chunk .. indentString .. "\"" .. self:escapeString(k) .. "\"" .. " " .. vchunk
                   end
                end
             end
