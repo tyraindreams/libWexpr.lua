@@ -203,12 +203,12 @@ local libWexpr = {
 		{
 			name = "reference definition",
 			pattern = function(self, chunk, index)
-				return string.match(string.sub(chunk, index), "^(%[[ \t]*[a-zA-Z_][a-zA-Z0-9_]*[ \t]*%])")
+				return string.match(string.sub(chunk, index), "^(%[[a-zA-Z_][a-zA-Z0-9_]*]*%])")
 			end,
 			syntax = true,
 			getValue = function(self, table)
 				local reference = self:getToken()
-				local referenceName = string.match(reference.token, "^%[[ \t]*([a-zA-Z_][a-zA-Z0-9_]*)[ \t]*%]")
+				local referenceName = string.match(reference.token, "^%[*([a-zA-Z_][a-zA-Z0-9_]*)*%]")
 
 				if self.references[referenceName] ~= nil then
 					self:warn("Warning: Redefining previously defined reference [" .. referenceName .."].", reference.index, #reference.token)
