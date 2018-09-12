@@ -129,7 +129,7 @@ local libWexpr = {
 		{
 			name = "word",
 			pattern = function(self, chunk, index)
-				return string.match(string.sub(chunk, index), "^([^%<%>%*#@%(%);%[%]\r\n \t]+)")
+				return string.match(string.sub(chunk, index), "^([^%<%>%\"%*#@%(%);%[%]\r\n \t]+)")
 			end,
 			syntax = true,
 			interpret = { -- Whether or not a word is interpretted as a valid concept in lua. The encode function uses this to determine if a string can be converted into a bare word or not.
