@@ -6,7 +6,7 @@
 -- @license MIT/X11
 local libWexpr = {
 	--- Version of the library.
-	version = "0.1.0",
+	version = "1.0.0",
 	--- Wexpr spec currently employed by the library.
 	WexprSpec = "0.1",
 
