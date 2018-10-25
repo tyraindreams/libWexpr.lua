@@ -193,7 +193,7 @@ local libWexpr = {
 			syntax = true,
 			getValue = function(self, table)
 				local reference = self:getToken()
-				local referenceName = string.match(reference.token, "^%*%[([a-zA-Z_][a-zA-Z0-9_]*)%]")
+				local referenceName = string.sub(reference.token, 3, #reference.token-1)
 				if self.references[referenceName] == nil then
 					self:throw("Syntax Error: Reference [" .. referenceName .."] is undefined.", reference.index, #reference.token)
 				end
@@ -208,11 +208,13 @@ local libWexpr = {
 			syntax = true,
 			getValue = function(self, table)
 				local reference = self:getToken()
-				local referenceName = string.match(reference.token, "^%[*([a-zA-Z_][a-zA-Z0-9_]*)*%]")
+				local referenceName = string.sub(reference.token, 2, #reference.token-1)
 
 				if self.references[referenceName] ~= nil then
 					self:warn("Warning: Redefining previously defined reference [" .. referenceName .."].", reference.index, #reference.token)
-					self:warn("Warning: Reference [" .. referenceName .."] was previously defined here.", self.references[referenceName].token.index, #self.references[referenceName].token.token)
+					if self.references[referenceName].token ~= nil then
+						self:warn("Warning: Reference [" .. referenceName .."] was previously defined here.", self.references[referenceName].token.index, #self.references[referenceName].token.token)
+					end
 				end
 
 				local token = self:nextToken()
@@ -571,13 +573,14 @@ local libWexpr = {
 	-- @tparam table self This function is called as a method.
 	-- @tparam string chunk The Wexpr to be decoded.
 	-- @tparam table table The prepopulated table to fill with additional values. Default is an empty table.
+	-- @tparam table references The prepopulated reference table to use. Default is an empty table.
 	-- @treturn any The value decoded from Wexpr.
 	-- @treturn string The error message. Will equal nil if there was no error.
-	decode = function(self, chunk, table)
+	decode = function(self, chunk, table, references)
 		table = table or {}
 
 		local decodeCall = function()
-			self:newWexpr(chunk)
+			self:newWexpr(chunk, references or {})
 			self:tokenize()
 
 			local token = self:nextToken()
@@ -735,17 +738,26 @@ local libWexpr = {
 	-- Resets the state and generates the lines for the error and warning messages.
 	-- @tparam table self This function is called as a method.
 	-- @tparam string chunk The Wexpr to decode.
+	-- @tparam table references The table for references.
 	-- @see throw
 	-- @see warn
 	-- @see chunkLines
-	newWexpr = function(self, chunk)
+	newWexpr = function(self, chunk, references)
 
 		self.index = 1
 		self.chunk = chunk
 		self.warnings = {}
 		self.errormsg = ""
 		self.tokenTable = {}
+		if type(references) ~= "table" then
+			error("References expected as table but instead found " .. type(references))
+		end
 		self.references = {}
+		for k,v in pairs(references) do
+			self.references[k] = {
+				value = v
+			}
+		end
 		self.chunkLines = {}
 
 		for l in (chunk.."\n"):gmatch("([^\n]-)[\n]") do
